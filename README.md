@@ -1,1 +1,1 @@
-# torch-image-classification
+# Pytorch Image Classification from pre-trained

@@ -1,13 +1,11 @@
 
 import os 
 import errno
-
 import torch
-
 from model import Net
 
 
-def save_checkpoint(PATH, epoch, model, optimizer, loss, acc):
+def save_checkpoint(PATH, epoch, model, optimizer, loss, acc, device):
 
     if not os.path.exists(os.path.dirname(PATH)):
         try:
@@ -27,6 +25,8 @@ def save_checkpoint(PATH, epoch, model, optimizer, loss, acc):
         "acc": acc
     },
     path_save)
+
+    model.to(device)
 
 
 

@@ -1,0 +1,4 @@
+train: ./data_dir/train
+val: ./data_dir/val
+test: ./data_dir/test
+batch_size: 16

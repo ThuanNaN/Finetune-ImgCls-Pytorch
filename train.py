@@ -1,135 +1,105 @@
-import argparse
-from dataset import CustomDataset
-from model import Net
+import time
+import copy
 import torch
-from utils import save_checkpoint, load_checkpoint, colorstr
-
-from tqdm import tqdm
-
-import logging
-logging.basicConfig(format="%(message)s", level=logging.INFO)
-LOGGER = logging.getLogger('CS-PyTorch')
-
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from models.finetune.ResNet import CustomResNet101
+from utils.dataset import CashewDataset
+from utils.common import get_data_transforms
 
 
-def train_model(model, dataloaders, optimizer, start_epoch, N_EPOCHS, device, checkpoint_PATH):
+import yaml
+from yaml.loader import SafeLoader
 
-    LOGGER.info(f"{colorstr('Optimizer:')} {model}")
-    LOGGER.info(f"{colorstr('Optimizer:')} {optimizer}")
+def train_model(model, dataloaders, criterion, optimizer, num_epochs, device):
+    since = time.time()
 
-    criterion = torch.nn.CrossEntropyLoss()
-    LOGGER.info(f"\n{colorstr('Loss:')} {type(criterion).__name__}")
+    val_acc_history = []
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_acc = 0.0
 
-    
+    model.to(device)
+    for epoch in range(num_epochs):
+        print("Epoch {}/{}".format(epoch, num_epochs-1))
+        print("-"*10)
 
-    for epoch in range(N_EPOCHS):
-        LOGGER.info(colorstr(f'\nEpoch {start_epoch+epoch + 1}/{start_epoch + N_EPOCHS }:'))
-
-        for phase in ["train", "valid"]:
-
-            running_loss = 0
-            running_accuracy = 0
-            correct = 0
-            total = 0
-
+        for phase in ["train", "val"]:
             if phase == "train":
-                LOGGER.info(colorstr('black', 'bold', '%20s' + '%15s' * 3) % 
-                                ('Training:', 'gpu_mem', 'loss', 'acc'))
                 model.train()
             else:
-                LOGGER.info(colorstr('black', 'bold', '\n%20s' + '%15s' * 3) % 
-                                ('Validation:','gpu_mem', 'loss', 'acc'))
                 model.eval()
-            
-            with tqdm(dataloaders[phase],
-                total=len(dataloaders[phase]),
-                bar_format='{desc} {percentage:>7.0f}%|{bar:10}{r_bar}{bar:-10b}',
-                unit='batch') as _phase:
 
-                for inputs, labels in _phase:
-                    inputs = inputs.to(device)
-                    labels = labels.to(device)
+            running_loss = 0.0
+            running_corrects = 0
 
-                    optimizer.zero_grad()
+            for inputs, labels in dataloaders[phase]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
 
-                    with torch.set_grad_enabled(phase =='train'):
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
-                        if phase == 'train':
-                            loss.backward()
-                            optimizer.step()
-                    
+                optimizer.zero_grad()
+
+                with torch.set_grad_enabled(phase == "train"):
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
                     _, preds = torch.max(outputs, 1)
-                    total += labels.size(0)
-                    correct += (preds == labels).sum().item()
 
-                    running_loss += loss.item() / len(dataloaders[phase])
-                    running_accuracy = 100.*correct/total
+                    if phase == 'train':
+                        loss.backward()
+                        optimizer.step()
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
 
-                    mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}GB'
-                    desc = ('%35s' + '%15.6g' * 2) % (mem, running_loss, running_accuracy)
-                    _phase.set_description_str(desc)
+            epoch_loss = running_loss / len(dataloaders[phase].dataset)
+            epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
+            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
-        #save_checkpoint
-        save_epoch = start_epoch+epoch + 1
-        save_checkpoint(checkpoint_PATH, epoch=save_epoch, model=model, optimizer=optimizer, loss=running_loss, acc= running_accuracy, device=device)
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = copy.deepcopy(model.state_dict())
+            if phase == 'val':
+                val_acc_history.append(epoch_acc)
 
+        print()
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description='Image classification with pytorch')
-    parser.add_argument(
-        "--load_checkpoint",  
-        type=bool,
-        nargs="?", 
-        help="Load check point", 
-        default= False
-    )
-    parser.add_argument(
-        "--N_EPOCH",  
-        type=int,
-        nargs="?", 
-        help="Num of epoch", 
-        default= "2"
-    )
-    parser.add_argument(
-        "--model_name", 
-        type=str,  
-        nargs="?",
-        help="Choose model", 
-        default="vgg16"
-    )
+    time_elapsed = time.time() - since
+    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Best val Acc: {:4f}'.format(best_acc))
+    model.load_state_dict(best_model_wts)
+    return model, val_acc_history
 
-    parser.add_argument(
-        "--n_class", 
-        type=int,  
-        nargs="?",
-        help="Number of classes", 
-        required=True
-    )
-
-    args = parser.parse_args()
-    return args
 
 
 if __name__ == "__main__":
 
-    args = parse_arguments()
-    device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
-    dir_path = "./data_dir"
-    dataloaders, _ = CustomDataset(dir_path, batch_size = 64).load_dataset()
+    with open("./config/data_config.yaml", "r") as f:
+        DATA_CONFIG  = yaml.load(f, Loader=SafeLoader)
 
-    checkpoint_dir = "./checkpoint"
-    num_class = args.n_class
-    if args.load_checkpoint:
-        epoch, model, optimizer = load_checkpoint(dir_path, num_class, device)
-        start_epoch = epoch
+    
+    with open("./config/model_config.yaml", "r") as f:
+        MODEL_CONFIG  = yaml.load(f, Loader=SafeLoader)
 
-    else:
-        start_epoch = 0
-        model = Net(num_class = num_class, model_name=args.model_name).create_model()
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-    N_EPOCHS = args.N_EPOCH
-    model.to(device)
-    train_model(model, dataloaders, optimizer, start_epoch, N_EPOCHS, device = device, checkpoint_PATH = checkpoint_dir)   
+    data_transforms = get_data_transforms()
+    train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
+    val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms["val"])
+
+    dataloaders = {
+        "train": DataLoader(train_dataset,DATA_CONFIG["batch_size"], shuffle=True), 
+        "val": DataLoader(val_dataset, DATA_CONFIG["batch_size"])
+    }
+
+    model = CustomResNet101(MODEL_CONFIG["n_classes"])
+
+    params_to_update = []
+    print("Parameters will update !")
+    for name,param in model.named_parameters():
+        if param.requires_grad == True:
+            params_to_update.append(param)
+            print("\t",name)
+
+    optimizer = optim.Adam(params_to_update, lr=MODEL_CONFIG["learning_rate"])
+    criterion = nn.CrossEntropyLoss()
+
+    model, hist = train_model(model, dataloaders, criterion, optimizer, num_epochs=MODEL_CONFIG["n_epochs"], device=MODEL_CONFIG["device"])

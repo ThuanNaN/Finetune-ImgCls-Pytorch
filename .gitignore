@@ -1,4 +1,4 @@
-
-/__pycache__
-/data_dir
-/checkpoint
+__pycache__/
+data/
+*.jpg
+test.py

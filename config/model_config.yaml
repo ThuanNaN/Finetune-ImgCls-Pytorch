@@ -1,0 +1,4 @@
+device: cuda
+n_classes: 2
+n_epochs: 20
+learning_rate: 0.001

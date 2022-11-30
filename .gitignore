@@ -1,4 +1,6 @@
 __pycache__/
 data/
+data_dir/
 *.jpg
 test.py
+.DS_Store

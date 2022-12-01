@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from models.finetune.ResNet import CustomResNet101
+from models.finetune.ViT import ViT_model
 from utils.dataset import CashewDataset
 from utils.dataset import get_data_transforms, IMAGE_NORM
 import yaml
@@ -27,13 +28,21 @@ if __name__ == "__main__":
 
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
     val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms["val"])
+    label_dict = train_dataset.label2id
+
+    label2id = { l: str(id) for l, id in zip(label_dict.keys(), label_dict.values())}
+    id2label = { str(id): l for l, id in zip(label_dict.keys(), label_dict.values())}
+
 
     dataloaders = {
         "train": DataLoader(train_dataset, opt.batch_size, shuffle=True), 
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
-    model = CustomResNet101(DATA_CONFIG["n_classes"])
+    # model = CustomResNet101(DATA_CONFIG["n_classes"])
+    model_name = "google/vit-base-patch32-224-in21k"
+    model = ViT_model(model_name, label2id, id2label)
+    opt.is_ViT = True
 
     params_to_update = []
     print("Parameters will update !")
@@ -45,7 +54,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(params_to_update, lr=opt.learning_rate)
     criterion = nn.CrossEntropyLoss()
 
-    model, hist, f_maxtrix = train_model(model, dataloaders, criterion, optimizer, num_epochs=opt.n_epochs, device=opt.device)
+    model, hist, f_maxtrix = train_model(model, dataloaders, criterion, optimizer, opt)
 
     print(hist)
     print(f_maxtrix)

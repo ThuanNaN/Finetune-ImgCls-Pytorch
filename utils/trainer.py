@@ -10,9 +10,10 @@ logging.getLogger().setLevel(logging.INFO)
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 LOGGER = logging.getLogger("Torch-Cls")
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs, device, PATH_SAVE = "./ckpt"):
-    since = time.time()
+def train_model(model, dataloaders, criterion, optimizer, opt):
+    device, num_epochs, PATH_SAVE, is_ViT = opt.device, opt.num_epochs, opt.PATH_SAVE, opt.is_ViT
 
+    since = time.time()
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")
     LOGGER.info(f"\n{colorstr('Loss:')} {type(criterion).__name__}")
 
@@ -53,6 +54,8 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs, device, PA
 
                     with torch.set_grad_enabled(phase == "train"):
                         outputs = model(inputs)
+                        if is_ViT:
+                            outputs = outputs.logits
                         loss = criterion(outputs, labels)
                         _, preds = torch.max(outputs, 1)
 

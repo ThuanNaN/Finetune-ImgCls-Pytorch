@@ -8,7 +8,7 @@ class CashewDataset(Dataset):
         self.images = datasets.ImageFolder(
                         dir_path, transform=data_transforms
                     )
-        self.class_dict = self.images.class_to_idx
+        self.label2id = self.images.class_to_idx
 
     
     def __getitem__(self, index):

@@ -1,5 +1,7 @@
 device: cuda
 n_classes: 2
-n_epochs: 1
+n_epochs: 2
 batch_size: 16
-learning_rate: 0.001
+learning_rate: 0.0002
+is_ViT: False
+PATH_SAVE: ./ckpt

@@ -1,18 +1,16 @@
 import torch
 import torch.nn as nn
 from torchvision import models
+from model_utils import set_parameter_requires_grad
 
-def set_parameter_requires_grad(model, feature_extracting):
-    if feature_extracting:
-        for param in model.parameters():
-            param.requires_grad = False
 
 class CustomResNet101(nn.Module):
-    def __init__(self, num_class):
+    def __init__(self, num_class, freeze_backbone = True):
         super(CustomResNet101, self).__init__()
         self.resnet = models.resnet101(weights = models.ResNet101_Weights.IMAGENET1K_V2)
         # Freeze 
-        set_parameter_requires_grad(self.resnet, feature_extracting=True)
+        if freeze_backbone:
+            set_parameter_requires_grad(self.resnet, feature_extracting=True)
 
         self.resnet.fc = nn.Sequential(
             nn.Linear(self.resnet.fc.in_features, 2048),

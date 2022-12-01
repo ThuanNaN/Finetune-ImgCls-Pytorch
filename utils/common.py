@@ -1,40 +1,6 @@
 import os
 import torch
-from torchvision import transforms
 
-IMG_NORM = {
-    "General": {
-        "IMG_MEAN": [0.485, 0.456, 0.406],
-        "IMG_STD": [0.229, 0.224, 0.225]
-    }
-}
-
-
-IMG_SIZE = {
-    "Resnet101_ImgNetV2": 232,
-}
-
-
-def get_data_transforms(image_size, image_norm):
-    data_transforms = {
-        "train": transforms.Compose([
-                    transforms.Resize((image_size,image_size)),
-                    # transforms.RandomHorizontalFlip(p=0.5),
-                    transforms.ToTensor(),
-                    transforms.Normalize(image_norm["IMG_MEAN"], image_norm["IMG_STD"])]),
-
-        "val": transforms.Compose([
-                    transforms.Resize((image_size,image_size)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(image_norm["IMG_MEAN"], image_norm["IMG_STD"])]),
-        
-        "test": transforms.Compose([
-                    transforms.Resize((image_size,image_size)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(image_norm["IMG_MEAN"], image_norm["IMG_STD"])]),
-    }
-
-    return data_transforms
 
 def save_ckpt(path_save, name_ckpt, model, optimizer):
     if not os.path.exists(path_save):

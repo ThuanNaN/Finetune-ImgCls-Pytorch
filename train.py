@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from models.finetune.ResNet import CustomResNet101
 from utils.dataset import CashewDataset
-from utils.common import get_data_transforms, IMG_NORM, IMG_SIZE
+from utils.dataset import get_data_transforms, IMAGE_NORM
 import yaml
 from yaml.loader import SafeLoader
 
@@ -22,8 +22,8 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-
-    data_transforms = get_data_transforms(image_size=IMG_SIZE["Resnet101_ImgNetV2"], image_norm=IMG_NORM["General"])
+    image_norm = IMAGE_NORM["resnet101-imagenetV2"]
+    data_transforms = get_data_transforms(**image_norm)
 
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
     val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms["val"])

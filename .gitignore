@@ -1,5 +1,7 @@
 __pycache__/
-data/
+data/data_train
+data/data_train_aug
 *.jpg
 test.py
 .DS_Store
+/ckpt

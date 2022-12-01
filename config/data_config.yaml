@@ -1,4 +1,4 @@
-train: ./data/data_train_aug/train
-val: ./data/data_train_aug/val
-test: ./data/data_train_aug/test
+train: ./data/data_train/train
+val: ./data/data_train/val
+test: ./data/data_train/test
 n_classes: 2

@@ -1,4 +1,4 @@
-device: cpu
+device: cuda
 n_classes: 2
 n_epochs: 1
 batch_size: 16

@@ -10,7 +10,7 @@ logging.getLogger().setLevel(logging.INFO)
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 LOGGER = logging.getLogger("Torch-Cls")
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs, device, PATH_SAVE = "ckpt/best.pt"):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs, device, PATH_SAVE = "./ckpt"):
     since = time.time()
 
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")

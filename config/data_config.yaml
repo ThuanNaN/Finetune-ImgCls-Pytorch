@@ -1,4 +1,4 @@
-train: ./data_dir/train
-val: ./data_dir/val
-test: ./data_dir/test
-batch_size: 16
+train: ./data/data_train_aug/train
+val: ./data/data_train_aug/val
+test: ./data/data_train_aug/test
+n_classes: 2

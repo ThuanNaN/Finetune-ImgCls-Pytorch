@@ -14,6 +14,8 @@ ratio = [0.7, 0.2, 0.1]
 
 lst = ["broken", "intact"]
 
+ouput_folder_name = "data_dir"
+
 for i, cls in enumerate([broken_list, intact_list]):
 
     num_data = len(cls)
@@ -33,5 +35,5 @@ for i, cls in enumerate([broken_list, intact_list]):
 
     for p in phase:
         for img in data_idx[p]:
-            cmd = "cp ./data/{}/{} ./data_dir/{}/{}/".format(lst[i],cls[img], p, lst[i])
+            cmd = "cp ./data/{}/{} ./{}/{}/{}/".format(lst[i],cls[img], ouput_folder_name, p, lst[i])
             os.system(cmd)

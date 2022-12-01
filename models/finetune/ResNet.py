@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision import models
-from model_utils import set_parameter_requires_grad
+from models.model_utils import set_parameter_requires_grad
 
 
 class CustomResNet101(nn.Module):

@@ -45,4 +45,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(params_to_update, lr=opt.learning_rate)
     criterion = nn.CrossEntropyLoss()
 
-    model, hist = train_model(model, dataloaders, criterion, optimizer, num_epochs=opt.n_epochs, device=opt.device)
+    model, hist, f_maxtrix = train_model(model, dataloaders, criterion, optimizer, num_epochs=opt.n_epochs, device=opt.device)
+
+    print(hist)
+    print(f_maxtrix)

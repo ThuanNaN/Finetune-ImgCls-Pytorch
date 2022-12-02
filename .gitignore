@@ -5,3 +5,4 @@ data/data_train_aug
 test.py
 .DS_Store
 /ckpt
+*.zip

@@ -11,7 +11,7 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 LOGGER = logging.getLogger("Torch-Cls")
 
 def train_model(model, dataloaders, criterion, optimizer, opt):
-    device, num_epochs, PATH_SAVE, is_ViT = opt.device, opt.num_epochs, opt.PATH_SAVE, opt.is_ViT
+    device, num_epochs, PATH_SAVE, is_ViT = opt.device, opt.n_epochs, opt.PATH_SAVE, opt.is_ViT
 
     since = time.time()
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")

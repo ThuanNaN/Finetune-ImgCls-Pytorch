@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 from torchvision import models
-from models.model_utils import set_parameter_requires_grad
+from models.utils import set_parameter_requires_grad
 
 
-class CustomResNet101(nn.Module):
+class ResNetModel(nn.Module):
     def __init__(self, num_class, freeze_backbone = True):
-        super(CustomResNet101, self).__init__()
+        super(ResNetModel, self).__init__()
         self.resnet = models.resnet101(weights = models.ResNet101_Weights.IMAGENET1K_V2)
         # Freeze 
         if freeze_backbone:

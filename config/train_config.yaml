@@ -1,7 +1,8 @@
 device: cpu
 n_classes: 2
-n_epochs: 2
+n_epochs: 10
 batch_size: 16
 learning_rate: 0.0002
 is_ViT: False
 PATH_SAVE: ./ckpt
+# fp16: False

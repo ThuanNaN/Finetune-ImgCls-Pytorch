@@ -1,4 +1,4 @@
-train: ./data/data_train/train
-val: ./data/data_train/val
-test: ./data/data_train/test
+train: ./data/KFold_data/fold_0/train
+val: ./data/KFold_data/fold_0/val
+test: ./data/KFold_data/fold_0/test
 n_classes: 2

@@ -2,27 +2,20 @@ import os
 import torch
 
 
-def save_ckpt(path_save, name_ckpt, model, optimizer, epoch, loss):
+def save_ckpt(PATH, name_ckpt, model, optimizer, epoch):
+    path_save = os.path.join(PATH, "epoch_{}".format(epoch))
     if not os.path.exists(path_save):
         os.mkdir(path_save)
 
-    torch.save(
-        {
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            "epoch": epoch,
-            "loss": loss
-        },
-        os.path.join(path_save, name_ckpt)
-    )
+    torch.save(model.state_dict(),os.path.join(path_save, name_ckpt))
+    torch.save(optimizer.state_dict(),os.path.join(path_save, "optimizer.pt"))
 
-def load_ckpt(ckpt_path, model, optimizer, epoch, loss):
+
+def load_ckpt(ckpt_path, model, optimizer):
     ckpt = torch.load(ckpt_path)
     model.load_state_dict(ckpt["model_state_dict"])
     optimizer.load_state_dict(ckpt["optimizer_state_dict"])
-    epoch = ckpt["epoch"]
-    loss = ckpt["loss"]
-    return model, optimizer, epoch, loss
+    return model, optimizer
 
 def colorstr(*input):
     *args, string = input if len(input) > 1 else ('blue', 'bold', input[0]) 

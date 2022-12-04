@@ -8,8 +8,9 @@ from utils.dataset import CashewDataset
 from utils.dataset import get_data_transforms, IMAGE_NORM
 import yaml
 from yaml.loader import SafeLoader
+from utils.Trainer import train_model
 
-from utils.trainer import train_model
+
 
 
 if __name__ == "__main__":
@@ -27,10 +28,10 @@ if __name__ == "__main__":
 
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
     val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms["val"])
-    label_dict = train_dataset.label2id
 
-    label2id = { l: str(id) for l, id in zip(label_dict.keys(), label_dict.values())}
-    id2label = { str(id): l for l, id in zip(label_dict.keys(), label_dict.values())}
+    # label_dict = train_dataset.label2id
+    # label2id = { l: str(id) for l, id in zip(label_dict.keys(), label_dict.values())}
+    # id2label = { str(id): l for l, id in zip(label_dict.keys(), label_dict.values())}
 
 
     dataloaders = {
@@ -38,20 +39,15 @@ if __name__ == "__main__":
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
-    # model = CustomResNet101(DATA_CONFIG["n_classes"])
-    model_name = "google/vit-base-patch32-224-in21k"
-    model = ViT_model(model_name, label2id, id2label)
-    opt.is_ViT = True
+    model = ResNetModel(DATA_CONFIG["n_classes"])
+    optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate)
 
-    params_to_update = []
-    print("Parameters will update !")
-    for name,param in model.named_parameters():
-        if param.requires_grad == True:
-            params_to_update.append(param)
-            print("\t",name)
-
-    optimizer = optim.Adam(params_to_update, lr=opt.learning_rate)
     criterion = nn.CrossEntropyLoss()
+
+    # if opt.fp16:
+    #     if not is_apex_available():
+    #         raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
+    #     model, optimizer = amp.initialize(model, optimizer, opt_level=opt.fp16_opt_level)
 
     model, hist, f_maxtrix = train_model(model, dataloaders, criterion, optimizer, opt)
 

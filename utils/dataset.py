@@ -45,16 +45,16 @@ def get_data_transforms(**image_norm):
 
 
 IMAGE_NORM = {
-    "resnet101-imagenetV1": 
+    "resnet101-IMAGENET1KV1": 
         {
-            "img_size": 224,
+            "img_size": 256,
             "img_mean": [0.485, 0.456, 0.406],
             "img_std": [0.229, 0.224, 0.225]
         },
 
-    "resnet101-imagenetV2": 
+    "resnet101-IMAGENET1KV2": 
         {
-            "img_size": 224,
+            "img_size": 232,
             "img_mean": [0.485, 0.456, 0.406],
             "img_std": [0.229, 0.224, 0.225]
         },

@@ -23,7 +23,7 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-    image_norm = IMAGE_NORM["resnet101-imagenetV2"]
+    image_norm = IMAGE_NORM["resnet101-IMAGENET1KV2"]
     data_transforms = get_data_transforms(**image_norm)
 
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
@@ -39,8 +39,8 @@ if __name__ == "__main__":
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
-    model = ResNetModel(DATA_CONFIG["n_classes"])
-    optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate)
+    model = ResNetModel(DATA_CONFIG["n_classes"], freeze_backbone= False)
+    optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate, weight_decay=opt.weight_decay)
 
     criterion = nn.CrossEntropyLoss()
 

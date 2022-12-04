@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from torchvision import models
 from models.utils import set_parameter_requires_grad
@@ -20,7 +19,7 @@ class ResNetModel(nn.Module):
         self.resnet.fc = nn.Sequential(
             nn.Linear(self.resnet.fc.in_features, 1024),
             nn.GELU(),
-            nn.Dropout(0.1, inplace=True),
+            nn.Dropout(0.1),
             nn.Linear(1024, num_class)
         )
 

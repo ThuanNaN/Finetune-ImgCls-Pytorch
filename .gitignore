@@ -1,6 +1,5 @@
 __pycache__/
-data/data_train
-data/data_train_aug
+data/
 *.jpg
 test.py
 .DS_Store

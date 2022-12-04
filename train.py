@@ -8,7 +8,7 @@ from utils.dataset import CashewDataset
 from utils.dataset import get_data_transforms, IMAGE_NORM
 import yaml
 from yaml.loader import SafeLoader
-from utils.Trainer import train_model
+from utils.trainer import train_model
 
 
 

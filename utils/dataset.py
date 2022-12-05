@@ -26,7 +26,6 @@ def get_data_transforms(**image_norm):
     data_transforms = {
         "train": transforms.Compose([
                     transforms.Resize((image_size,image_size)),
-                    # transforms.RandomHorizontalFlip(p=0.5),
                     transforms.ToTensor(),
                     transforms.Normalize(image_mean, image_std)]),
 

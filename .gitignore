@@ -1,6 +1,6 @@
 __pycache__/
 data/
-ckpt/
 *.jpg
 .DS_Store
 *.zip
+ckpt/

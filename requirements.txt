@@ -4,3 +4,5 @@ transformers
 numpy
 PyYaml
 tqdm
+onnx
+netron

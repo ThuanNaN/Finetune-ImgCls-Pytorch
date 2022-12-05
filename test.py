@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     ckpt_path = "./ckpt/best.pt"
     ckpt = torch.load(ckpt_path)
-    model.load_state_dict(ckpt["model_state_dict"])
+    model.load_state_dict(ckpt)
 
     model.eval()
         

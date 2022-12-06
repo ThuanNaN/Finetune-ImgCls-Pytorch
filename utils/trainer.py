@@ -16,7 +16,7 @@ LOGGER = logging.getLogger("Torch-Cls")
 
 
 def train_model(model, dataloaders, criterion, optimizer, opt):
-    device, num_epochs, PATH_SAVE, is_ViT = opt.device, opt.n_epochs, opt.PATH_SAVE, opt.is_ViT
+    device, num_epochs, PATH_SAVE, is_ViT, num_cls = opt.device, opt.n_epochs, opt.PATH_SAVE, opt.is_ViT, opt.n_classes
 
     since = time.time()
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")
@@ -25,7 +25,7 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
     val_acc_history = []
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
-    best_confusion_matrix = torch.zeros(2, 2)
+    best_confusion_matrix = torch.zeros(num_cls, num_cls)
 
     model.to(device)
     for epoch in range(num_epochs):
@@ -44,7 +44,7 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
             running_items = 0
             running_loss = 0.0
             running_corrects = 0
-            confusion_matrix = torch.zeros(2, 2)
+            confusion_matrix = torch.zeros(num_cls, num_cls)
 
             with tqdm(dataloaders[phase],
                 total=len(dataloaders[phase]),

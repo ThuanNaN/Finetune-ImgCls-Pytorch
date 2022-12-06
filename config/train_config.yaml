@@ -1,9 +1,9 @@
-device: cpu
-n_classes: 2
-n_epochs: 10
+device: cuda
+n_classes: 3
+n_epochs: 5
 batch_size: 16
 learning_rate: 0.0002
-weight_decay: 0.1
+weight_decay: 0.0
 is_ViT: False
 PATH_SAVE: ./ckpt
 # fp16: False

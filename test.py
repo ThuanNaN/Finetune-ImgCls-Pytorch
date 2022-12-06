@@ -24,7 +24,7 @@ def test_model(model, test_loader, device):
             corrects += torch.sum(preds == labels.data)
 
             for t, p in zip(labels.view(-1), preds.view(-1)):
-                confusion_matrix[t.long, p.long] +=1
+                confusion_matrix[t.long(), p.long()] +=1
     acc = corrects / totals
     return acc, confusion_matrix
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-    image_norm = IMAGE_NORM["resnet101-imagenetV2"]
+    image_norm = IMAGE_NORM["resnet101-IMAGENET1KV2"]
     data_transforms = get_data_transforms(**image_norm)
 
     test_dataset = CashewDataset(DATA_CONFIG["test"], data_transforms["test"])
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     model = ResNetModel(DATA_CONFIG["n_classes"], weight_pretrain=False, freeze_backbone=False)
 
-    ckpt_path = "./ckpt/best.pt"
+    ckpt_path = "./ckpt/epoch_4/best.pt"
     ckpt = torch.load(ckpt_path)
     model.load_state_dict(ckpt)
 

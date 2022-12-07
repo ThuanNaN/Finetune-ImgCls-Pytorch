@@ -3,5 +3,4 @@ data/
 *.jpg
 .DS_Store
 *.zip
-ckpt/
 test_case/

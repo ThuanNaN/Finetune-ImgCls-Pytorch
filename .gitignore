@@ -1,6 +1,9 @@
 __pycache__/
+.DS_Store
+
+
 data/
 *.jpg
-.DS_Store
 *.zip
 test_case/
+ckpt/

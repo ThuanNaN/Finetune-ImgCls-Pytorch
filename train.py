@@ -23,15 +23,18 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-    image_norm = IMAGE_NORM["resnet101-IMAGENET1KV2"]
+    num_classes = DATA_CONFIG["n_classes"]
+
+    image_norm = IMAGE_NORM["IMAGENET1K_V2"]
     data_transforms = get_data_transforms(**image_norm)
 
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
     val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms["val"])
 
-    # label_dict = train_dataset.label2id
-    # label2id = { l: str(id) for l, id in zip(label_dict.keys(), label_dict.values())}
-    # id2label = { str(id): l for l, id in zip(label_dict.keys(), label_dict.values())}
+    if opt.is_ViT:
+        label_dict = train_dataset.label2id
+        label2id = { l: str(id) for l, id in zip(label_dict.keys(), label_dict.values())}
+        id2label = { str(id): l for l, id in zip(label_dict.keys(), label_dict.values())}
 
 
     dataloaders = {
@@ -39,7 +42,7 @@ if __name__ == "__main__":
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
-    model = ResNetModel(DATA_CONFIG["n_classes"], freeze_backbone= False)
+    model = ResNetModel(num_classes, resnet_version=opt.model_name, weight_pretrained=opt.weight_pretrained, freeze_backbone = opt.freeze_backbone)
     optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate, weight_decay=opt.weight_decay)
 
     criterion = nn.CrossEntropyLoss()

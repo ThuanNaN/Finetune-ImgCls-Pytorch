@@ -22,7 +22,7 @@ def get_data_transforms(ModelAndWeights, model_name, weight_name):
     try:
         return ModelAndWeights[model_name][weight_name].transforms()
     except:
-        raise Exception("Can not find pretrained weight !!!")
+        raise Exception("Can not find pretrained model: {} with: {} !!!".format(model_name, weight_name))
 
 
 

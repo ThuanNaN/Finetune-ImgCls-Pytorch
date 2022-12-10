@@ -1,20 +1,28 @@
 import torch
 import torch.nn as nn
+from torchvision import models
 from models.utils import set_parameter_requires_grad
+
+def load_alex(opt):
+    if opt.model_name == "alexnet":
+        if opt.load_weight:
+            print("Load pretrained model weight !")
+            return models.alexnet(weights = opt.weight_name)
+        return models.alexnet(weights = None)
 
 
 class AlexNetModel(nn.Module):
-    def __init__(self, num_class, model_name = "alexnet", weight_pretrained = "IMAGENET1K_V1", freeze_backbone = False):
+    def __init__(self, opt):
         super(AlexNetModel, self).__init__()
-        self.num_classes = num_class
+        self.num_classes = opt.n_classes
 
-        self.model = torch.hub.load("pytorch/vision", model_name, weights=weight_pretrained)
+        self.model = load_alex(opt)
 
-        if freeze_backbone:
+        if opt.freeze_backbone:
             set_parameter_requires_grad(self.model)
 
         num_ftrs = self.model.classifier[6].in_features
-        self.model.classifier[6] = nn.Linear(num_ftrs, num_class)
+        self.model.classifier[6] = nn.Linear(num_ftrs, self.num_classes)
 
         params_to_update = []
         name_params_to_update = []

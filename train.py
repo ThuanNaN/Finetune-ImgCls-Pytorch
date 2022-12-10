@@ -2,17 +2,33 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
+
 from models.ResNet import ResNetModel
 from models.AlexNet import AlexNetModel
 from models.DenseNet import DenseNetModel
 from models.InceptionV3Net import InceptionV3NetModel
 from models.VGGNet import VGGNetModel
+
+from torch.utils.data import DataLoader
 from utils.dataset import CashewDataset
 from utils.dataset import get_data_transforms, ModelAndWeights
 import yaml
 from yaml.loader import SafeLoader
 from utils.trainer import train_model
+
+
+
+def load_model(opt):
+    if opt.model_name in ["resnet18", "resnet34", "resnet50", "resnet101", "resnet152"]:
+        return ResNetModel(opt)
+    elif opt.model_name in ["alexnet"]:
+        return AlexNetModel(opt)
+    elif opt.model_name in ["densenet121", "densenet161", "densenet169", "densenet201"]:
+        return DenseNetModel(opt)
+    elif opt.model_name in ["inception_v3"]:
+        return InceptionV3NetModel(opt) 
+    elif opt.model_name in ["vgg11", "vgg11bn", "vgg13", "vgg13_bn", "vgg16", "vgg16_bn", "vgg19", "vgg19_bn"]:
+        return VGGNetModel(opt) 
 
 
 if __name__ == "__main__":
@@ -34,23 +50,18 @@ if __name__ == "__main__":
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms)
     val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms)
 
-    if opt.is_ViT:
-        label_dict = train_dataset.label2id
-        label2id = { l: str(id) for l, id in zip(label_dict.keys(), label_dict.values())}
-        id2label = { str(id): l for l, id in zip(label_dict.keys(), label_dict.values())}
-
+    label_dict = train_dataset.label2id
 
     dataloaders = {
         "train": DataLoader(train_dataset, opt.batch_size, shuffle=True), 
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
-    model = VGGNetModel(num_class = opt.n_classes , model_name=opt.model_name, weight_pretrained=opt.weight_name, freeze_backbone = opt.freeze_backbone)
+
+    model = load_model(opt)
     optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate, weight_decay=opt.weight_decay)
 
     criterion = nn.CrossEntropyLoss()
-
-    print(model.eval())
 
     # if opt.fp16:
     #     if not is_apex_available():

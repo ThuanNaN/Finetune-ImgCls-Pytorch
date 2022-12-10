@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from models.ResNet import ResNetModel
-from models.ViT import ViT_model
 from utils.dataset import CashewDataset
 from utils.dataset import get_data_transforms, IMAGE_NORM
 import yaml

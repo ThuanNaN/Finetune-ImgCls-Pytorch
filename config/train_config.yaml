@@ -1,9 +1,10 @@
 n_epochs: 5
 batch_size: 16
 learning_rate: 0.0002
-weight_decay: 0.0
+weight_decay: 0.0002
 PATH_SAVE: ./ckpt
 model_name: resnet50
 weight_name: IMAGENET1K_V1
 load_weight: True
 freeze_backbone: False
+default_data_transform: False

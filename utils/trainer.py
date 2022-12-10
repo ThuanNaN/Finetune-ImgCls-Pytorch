@@ -16,7 +16,7 @@ LOGGER = logging.getLogger("Torch-Cls")
 
 
 def train_model(model, dataloaders, criterion, optimizer, opt):
-    device, num_epochs, PATH_SAVE, is_ViT, num_cls = opt.device, opt.n_epochs, opt.PATH_SAVE, opt.is_ViT, opt.n_classes
+    device, num_epochs, PATH_SAVE, num_cls = opt.device, opt.n_epochs, opt.PATH_SAVE, opt.n_classes
 
     since = time.time()
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")
@@ -59,8 +59,6 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
 
                     with torch.set_grad_enabled(phase == "train"):
                         outputs = model(inputs)
-                        if is_ViT:
-                            outputs = outputs.logits
                         loss = criterion(outputs, labels)
                         _, preds = torch.max(outputs, 1)
 

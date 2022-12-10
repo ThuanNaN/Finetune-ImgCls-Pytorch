@@ -1,1 +1,1 @@
-#Image Classification with Resnet model (Pytorch) from Scratch/PreTrained Models
+# Finetune Pytorch model for Image Classification

@@ -38,10 +38,9 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-    image_norm = IMAGE_NORM["resnet101-IMAGENET1KV2"]
-    data_transforms = get_data_transforms(**image_norm)
+    data_transforms = get_data_transforms(opt.model_name)
 
-    test_dataset = CashewDataset(DATA_CONFIG["test"], data_transforms["test"])
+    test_dataset = CashewDataset(DATA_CONFIG["test"], data_transforms)
     test_loader = DataLoader(test_dataset, opt.batch_size)
 
     model = ResNetModel(DATA_CONFIG["n_classes"], weight_pretrain=False, freeze_backbone=False)

@@ -1,7 +1,7 @@
 import argparse
 import yaml
 from yaml import SafeLoader
-from utils.dataset import IMAGE_NORM, get_data_transforms, CashewDataset
+from utils.dataset import get_data_transforms, CashewDataset
 from torch.utils.data import DataLoader
 from models.ResNet import ResNetModel
 import torch
@@ -18,8 +18,7 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-    image_norm = IMAGE_NORM["resnet101-IMAGENET1KV2"]
-    data_transforms = get_data_transforms(**image_norm)["test"]
+    data_transforms = get_data_transforms(opt.model_name)
 
     model = ResNetModel(DATA_CONFIG["n_classes"], weight_pretrain=False, freeze_backbone=False)
 

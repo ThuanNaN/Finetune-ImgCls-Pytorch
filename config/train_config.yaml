@@ -1,10 +1,9 @@
-device: cuda
 n_epochs: 5
 batch_size: 16
 learning_rate: 0.0002
 weight_decay: 0.0
 PATH_SAVE: ./ckpt
 is_ViT: False
-model_name: resnet50
-weight_pretrained: IMAGENET1K_V2
+model_name: vgg16
+weight_name: IMAGENET1K_V1
 freeze_backbone: False

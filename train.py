@@ -1,15 +1,18 @@
 import argparse
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from models.ResNet import ResNetModel
+from models.AlexNet import AlexNetModel
+from models.DenseNet import DenseNetModel
+from models.InceptionV3Net import InceptionV3NetModel
+from models.VGGNet import VGGNetModel
 from utils.dataset import CashewDataset
-from utils.dataset import get_data_transforms, IMAGE_NORM
+from utils.dataset import get_data_transforms, ModelAndWeights
 import yaml
 from yaml.loader import SafeLoader
 from utils.trainer import train_model
-
-
 
 
 if __name__ == "__main__":
@@ -22,13 +25,14 @@ if __name__ == "__main__":
     with open("./config/train_config.yaml") as f:
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
-    num_classes = DATA_CONFIG["n_classes"]
+    opt.n_classes = DATA_CONFIG["n_classes"]
+    opt.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    image_norm = IMAGE_NORM["IMAGENET1K_V2"]
-    data_transforms = get_data_transforms(**image_norm)
+    data_transforms = get_data_transforms(ModelAndWeights, opt.model_name, opt.weight_name)
 
-    train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms["train"])
-    val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms["val"])
+
+    train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms)
+    val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms)
 
     if opt.is_ViT:
         label_dict = train_dataset.label2id
@@ -41,10 +45,12 @@ if __name__ == "__main__":
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
-    model = ResNetModel(num_classes, resnet_version=opt.model_name, weight_pretrained=opt.weight_pretrained, freeze_backbone = opt.freeze_backbone)
+    model = VGGNetModel(num_class = opt.n_classes , model_name=opt.model_name, weight_pretrained=opt.weight_name, freeze_backbone = opt.freeze_backbone)
     optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate, weight_decay=opt.weight_decay)
 
     criterion = nn.CrossEntropyLoss()
+
+    print(model.eval())
 
     # if opt.fp16:
     #     if not is_apex_available():
@@ -55,3 +61,5 @@ if __name__ == "__main__":
 
     print(hist)
     print(f_maxtrix)
+
+

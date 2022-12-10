@@ -1,5 +1,4 @@
-
-from torchvision import datasets, transforms
+from torchvision import datasets, models
 from torch.utils.data import Dataset
 
 class CashewDataset(Dataset):
@@ -19,43 +18,85 @@ class CashewDataset(Dataset):
         return len(self.images)
 
 
-def get_data_transforms(**image_norm):
-    image_size = image_norm["img_size"]
-    image_mean = image_norm["img_mean"]
-    image_std = image_norm["img_std"]
-    data_transforms = {
-        "train": transforms.Compose([
-                    transforms.Resize((image_size,image_size)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(image_mean, image_std)]),
-
-        "val": transforms.Compose([
-                    transforms.Resize((image_size,image_size)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(image_mean, image_std)]),
-        
-        "test": transforms.Compose([
-                    transforms.Resize((image_size,image_size)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(image_mean, image_std)]),
-    }
-
-    return data_transforms
+def get_data_transforms(ModelAndWeights, model_name, weight_name):
+    try:
+        return ModelAndWeights[model_name][weight_name].transforms()
+    except:
+        raise Exception("Can not find pretrained weight !!!")
 
 
-IMAGE_NORM = {
-    "IMAGENET1K_V1": 
-        {
-            "img_size": 256,
-            "img_mean": [0.485, 0.456, 0.406],
-            "img_std": [0.229, 0.224, 0.225]
-        },
 
-    "IMAGENET1K_V2": 
-        {
-            "img_size": 232,
-            "img_mean": [0.485, 0.456, 0.406],
-            "img_std": [0.229, 0.224, 0.225]
-        },
+ModelAndWeights = {
+
+    # AlexNet
+    "alexnet": {
+        "IMAGENET1K_V1" : models.AlexNet_Weights.IMAGENET1K_V1
+    },
+    
+    # Resnet
+    "resnet18": {
+        "IMAGENET1K_V1": models.ResNet18_Weights.IMAGENET1K_V1
+    },
+    "resnet34": {
+        "IMAGENET1K_V1": models.ResNet34_Weights.IMAGENET1K_V1
+    },
+    "resnet50": {
+        "IMAGENET1K_V1": models.ResNet50_Weights.IMAGENET1K_V1,
+        "IMAGENET1K_V2": models.ResNet50_Weights.IMAGENET1K_V2
+    },
+    "resnet101": {
+        "IMAGENET1K_V1": models.ResNet101_Weights.IMAGENET1K_V1,
+        "IMAGENET1K_V2": models.ResNet101_Weights.IMAGENET1K_V2
+    },
+    "resnet152": {
+        "IMAGENET1K_V1": models.ResNet152_Weights.IMAGENET1K_V1,
+        "IMAGENET1K_V2": models.ResNet152_Weights.IMAGENET1K_V2
+    },
+
+    # DenseNet
+    "densenet121": {
+        "IMAGENET1K_V1": models.DenseNet121_Weights.IMAGENET1K_V1
+    }, 
+    "densenet161": {
+        "IMAGENET1K_V1": models.DenseNet161_Weights.IMAGENET1K_V1
+    },
+    "densenet169": {
+        "IMAGENET1K_V1": models.DenseNet169_Weights.IMAGENET1K_V1
+    },
+    "densenet201": {
+        "IMAGENET1K_V1": models.DenseNet201_Weights.IMAGENET1K_V1
+    },
+
+    #InceptionV3Net
+    "inception_v3": {
+        "IMAGENET1K_V1": models.Inception_V3_Weights.IMAGENET1K_V1
+    },
+
+    #VGGNet
+    "vgg11":{
+        "IMAGENET1K_V1": models.VGG11_Weights.IMAGENET1K_V1
+    },
+    "vgg11_bn":{
+        "IMAGENET1K_V1": models.VGG11_BN_Weights.IMAGENET1K_V1
+    },
+    "vgg13":{
+        "IMAGENET1K_V1": models.VGG13_Weights.IMAGENET1K_V1
+    },
+    "vgg13_bn":{
+        "IMAGENET1K_V1": models.VGG13_BN_Weights.IMAGENET1K_V1
+    },
+    "vgg16":{
+        "IMAGENET1K_V1": models.VGG16_Weights.IMAGENET1K_V1
+    },
+    "vgg16_bn":{
+        "IMAGENET1K_V1": models.VGG16_BN_Weights.IMAGENET1K_V1
+    },
+    "vgg19":{
+        "IMAGENET1K_V1": models.VGG19_Weights.IMAGENET1K_V1
+    },
+    "vgg19_bn":{
+        "IMAGENET1K_V1": models.VGG19_BN_Weights.IMAGENET1K_V1
+    },
 }
+
 

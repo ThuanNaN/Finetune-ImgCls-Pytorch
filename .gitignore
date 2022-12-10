@@ -5,3 +5,4 @@ data/
 *.zip
 test_case/
 ckpt/
+test_code.py

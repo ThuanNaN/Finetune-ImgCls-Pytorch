@@ -2,6 +2,7 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torchvision
 
 from models.ResNet import ResNetModel
 from models.AlexNet import AlexNetModel
@@ -44,8 +45,17 @@ if __name__ == "__main__":
     opt.n_classes = DATA_CONFIG["n_classes"]
     opt.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    data_transforms = get_data_transforms(ModelAndWeights, opt.model_name, opt.weight_name)
+    if opt.default_data_transform:
+        data_transforms = get_data_transforms(ModelAndWeights, opt.model_name, opt.weight_name)
+    else:
+        data_transforms = torchvision.transforms.Compose([
+            torchvision.transforms.Resize((224,224)),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), 
+        ])
 
+    print("Data transforms: ")
+    print(data_transforms)
 
     train_dataset = CashewDataset(DATA_CONFIG["train"], data_transforms)
     val_dataset = CashewDataset(DATA_CONFIG["val"], data_transforms)

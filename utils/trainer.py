@@ -2,6 +2,7 @@ import torch
 import time
 import copy
 import logging
+import numpy as np
 from tqdm import tqdm
 
 from utils.common import colorstr, save_ckpt
@@ -9,9 +10,6 @@ from utils.common import colorstr, save_ckpt
 logging.getLogger().setLevel(logging.INFO)
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 LOGGER = logging.getLogger("Torch-Cls")
-
-
-
 
 
 
@@ -74,7 +72,7 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                         confusion_matrix[t.long(), p.long()] += 1
 
                     epoch_loss = running_loss / running_items
-                    epoch_acc = running_corrects.double() / running_items
+                    epoch_acc = running_corrects.float() / running_items
 
                     mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}GB'
                     desc = ('%35s' + '%15.6g' * 2) % (mem, epoch_loss, epoch_acc)
@@ -84,7 +82,7 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
-                save_ckpt(PATH_SAVE, "best.pt", model, optimizer, epoch)
+                save_ckpt(model, optimizer, epoch, PATH_SAVE, "best.pt")
                 best_confusion_matrix = confusion_matrix
             if phase == 'val':
                 val_acc_history.append(epoch_acc)

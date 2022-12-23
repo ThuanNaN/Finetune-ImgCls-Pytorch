@@ -1,4 +1,5 @@
-train: ./data/fold_0/train
-val: ./data/fold_0/val
-test: ./data/fold_0/test
-n_classes: 2
+train: ./data/CIFAR10/train
+val: ./data/CIFAR10/test
+test: ./data/CIFAR10/test
+
+n_classes: 10

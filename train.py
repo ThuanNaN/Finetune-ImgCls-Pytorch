@@ -43,7 +43,16 @@ if __name__ == "__main__":
         opt = argparse.Namespace(**yaml.load(f, Loader=yaml.SafeLoader))
 
     opt.n_classes = DATA_CONFIG["n_classes"]
-    opt.device = "cuda" if torch.cuda.is_available() else "cpu"
+     
+    
+    if torch.cuda.is_available():
+        opt.device = "cuda"
+    elif torch.backends.mps.is_available():
+        opt.device = "mps"
+    else:
+        opt.device = "cpu"
+    
+    print("DEVICE: ", opt.device)
 
     if opt.default_data_transform:
         data_transforms = get_data_transforms(ModelAndWeights, opt.model_name, opt.weight_name)

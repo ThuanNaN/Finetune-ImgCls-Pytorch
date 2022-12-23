@@ -2,7 +2,7 @@ import os
 import torch
 
 
-def save_ckpt(PATH, name_ckpt, model, optimizer, epoch):
+def save_ckpt(model, optimizer, epoch, PATH, name_ckpt):
     path_save = os.path.join(PATH, "epoch_{}".format(epoch))
     if not os.path.exists(path_save):
         os.mkdir(path_save)

@@ -2,13 +2,17 @@ import os
 import torch
 
 
-def save_ckpt(model, optimizer, epoch, PATH, name_ckpt):
-    path_save = os.path.join(PATH, "epoch_{}".format(epoch))
+def save_ckpt(model, optimizer, name_ckpt, PATH):
+    path_save = os.path.join(PATH, "weights")
     if not os.path.exists(path_save):
         os.mkdir(path_save)
+    
+    models_ckpt = {
+        model: model.state_dict(),
+        optimizer: optimizer.state_dict()
+    }
 
-    torch.save(model.state_dict(),os.path.join(path_save, name_ckpt))
-    torch.save(optimizer.state_dict(),os.path.join(path_save, "optimizer.pt"))
+    torch.save(models_ckpt,os.path.join(path_save, name_ckpt))
 
 
 def load_ckpt(ckpt_path, model, optimizer):

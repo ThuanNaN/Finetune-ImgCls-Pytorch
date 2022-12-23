@@ -72,7 +72,7 @@ if __name__ == "__main__":
     label_dict = train_dataset.label2id
 
     dataloaders = {
-        "train": DataLoader(train_dataset, opt.batch_size, shuffle=True), 
+        "train": DataLoader(train_dataset, opt.batch_size, shuffle=True, num_workers = 8), 
         "val": DataLoader(val_dataset, opt.batch_size)
     }
 
@@ -81,11 +81,6 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.params_to_update, lr=opt.learning_rate, weight_decay=opt.weight_decay)
 
     criterion = nn.CrossEntropyLoss()
-
-    # if opt.fp16:
-    #     if not is_apex_available():
-    #         raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
-    #     model, optimizer = amp.initialize(model, optimizer, opt_level=opt.fp16_opt_level)
 
     model, hist, f_maxtrix = train_model(model, dataloaders, criterion, optimizer, opt)
 

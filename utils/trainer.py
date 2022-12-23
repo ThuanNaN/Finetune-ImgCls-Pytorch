@@ -79,10 +79,11 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                     _phase.set_description_str(desc)
 
 
+            save_ckpt(model, optimizer, PATH_SAVE, "epoch_{}.pt".format(epoch))
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
-                save_ckpt(model, optimizer, epoch, PATH_SAVE, "best.pt")
+                save_ckpt(model, optimizer, PATH_SAVE, "best.pt")
                 best_confusion_matrix = confusion_matrix
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
@@ -92,8 +93,9 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s with {} epochs'.format(time_elapsed // 60, time_elapsed % 60, num_epochs))
     print('Best val Acc: {:4f}'.format(best_acc))
+    save_ckpt(model, optimizer, epoch, PATH_SAVE, "last.pt")
     model.load_state_dict(best_model_wts)
-    # save_ckpt(PATH_SAVE, "last.pt", model, optimizer, epoch, loss)
+    
 
     return model, val_acc_history, best_confusion_matrix
 

@@ -2,7 +2,7 @@ import os
 import torch
 
 
-def save_ckpt(model, optimizer, name_ckpt, PATH):
+def save_ckpt(model, optimizer, PATH, name_ckpt):
     path_save = os.path.join(PATH, "weights")
     if not os.path.exists(path_save):
         os.mkdir(path_save)

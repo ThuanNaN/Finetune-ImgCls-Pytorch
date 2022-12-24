@@ -82,9 +82,5 @@ if __name__ == "__main__":
 
     criterion = nn.CrossEntropyLoss()
 
-    model, hist, f_maxtrix = train_model(model, dataloaders, criterion, optimizer, opt)
-
-    print(hist)
-    print(f_maxtrix)
-
+    model = train_model(model, dataloaders, criterion, optimizer, opt)
 

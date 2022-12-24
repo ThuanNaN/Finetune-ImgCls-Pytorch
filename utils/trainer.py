@@ -93,9 +93,10 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s with {} epochs'.format(time_elapsed // 60, time_elapsed % 60, num_epochs))
     print('Best val Acc: {:4f}'.format(best_acc))
-    save_ckpt(model, optimizer, epoch, PATH_SAVE, "last.pt")
+    save_ckpt(model, optimizer, PATH_SAVE, "last.pt")
     model.load_state_dict(best_model_wts)
     
+    #plot and save
 
-    return model, val_acc_history, best_confusion_matrix
+    return model
 

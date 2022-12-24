@@ -8,8 +8,8 @@ def save_ckpt(model, optimizer, PATH, name_ckpt):
         os.mkdir(path_save)
     
     models_ckpt = {
-        model: model.state_dict(),
-        optimizer: optimizer.state_dict()
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict()
     }
 
     torch.save(models_ckpt,os.path.join(path_save, name_ckpt))

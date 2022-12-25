@@ -21,13 +21,34 @@ def load_ckpt(ckpt_path, model, optimizer):
     optimizer.load_state_dict(ckpt["optimizer_state_dict"])
     return model, optimizer
 
+def get_metrics(num_cls, device, average = None):
 
-def save_result(num_classes):
-    precision_macro = torchmetrics.Precision(task="multiclass", average='macro', num_classes=num_classes)
-    precision_micro = torchmetrics.Precision(task="multiclass", average='micro', num_classes=num_classes)
-    recall_macro = torchmetrics.Recall(task="multiclass", average='macro', num_classes=num_classes)
-    recall_micro = torchmetrics.Recall(task="multiclass", average='micro', num_classes=num_classes)
+    accuracy = torchmetrics.Accuracy(task="multiclass", num_classes=num_cls, average=average).to(device)
+    precision = torchmetrics.Precision(task="multiclass", num_classes=num_cls, average=average).to(device)
+    recall= torchmetrics.Recall(task="multiclass", num_classes=num_cls, average=average).to(device)
+    f1_score = torchmetrics.F1Score(task="multiclass", num_classes=num_cls, average=average).to(device)
+
+    return {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1_score
+    }
+
+
+def save_result(epoch, predicts, targets, metrics, result_file):
     
+    precision = metrics['precision'](predicts, targets).detach().cpu().numpy()
+    recall = metrics['recall'](predicts, targets).detach().cpu().numpy()
+    accuracy = metrics['accuracy'](predicts, targets).detach().cpu().numpy()
+    f1_score = metrics['f1_score'](predicts, targets).detach().cpu().numpy()
+
+    with open(result_file, "a+") as f:
+        f.write(f"Epoch: {epoch}\t{accuracy:.6f}\t{precision:.6f}\t{recall:.6f}\t{f1_score:.6f}\n\n")
+
+
+
+
 
 def colorstr(*input):
     *args, string = input if len(input) > 1 else ('blue', 'bold', input[0]) 

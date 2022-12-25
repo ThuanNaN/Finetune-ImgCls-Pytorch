@@ -1,23 +1,21 @@
-import torch 
-import torchmetrics
 import time
 import copy
 import os
+import torch 
 import logging
 import numpy as np
 from tqdm import tqdm
-
-from utils.common import colorstr, save_ckpt
+from utils.common import colorstr, save_ckpt, save_result, get_metrics
 
 logging.getLogger().setLevel(logging.INFO)
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 LOGGER = logging.getLogger("Torch-Cls")
 
 
-accuracy = torchmetrics.Accuracy(task="multiclass", num_classes=10, average='macro')
-
 def train_model(model, dataloaders, criterion, optimizer, opt):
     device, num_epochs, num_cls = opt.device, opt.n_epochs, opt.n_classes
+
+    metrics = get_metrics(num_cls=num_cls, device=device, average = None)
 
     PATH_SAVE = os.path.join(opt.check_points, opt.ckpt_name)
     if not os.path.exists(PATH_SAVE):
@@ -27,6 +25,10 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
     since = time.time()
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")
     LOGGER.info(f"\n{colorstr('Loss:')} {type(criterion).__name__}")
+
+    result_file = os.path.join(PATH_SAVE, "result.txt")
+    with open(result_file, "w") as f:
+        f.write("\tEpochs\tAccuracy\tPrecision\tRecall\tF1-Score\n")
 
     val_acc_history = []
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -70,7 +72,6 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                         _, preds = torch.max(outputs, 1)
                         list_preds.append(preds)
                         
-
                         if phase == 'train':
                             loss.backward()
                             optimizer.step()
@@ -88,7 +89,8 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
 
             epoch_preds = torch.cat([x for x in list_preds], dim=0)
             epoch_targets = torch.cat([x for x in list_targets], dim=0)
-            print("acc: ", accuracy(epoch_preds, epoch_targets))
+
+            save_result(epoch, epoch_preds, epoch_targets, metrics, result_file)
 
             save_ckpt(model, optimizer, PATH_SAVE, "epoch_{}.pt".format(epoch))
             if phase == 'val' and epoch_acc > best_acc:

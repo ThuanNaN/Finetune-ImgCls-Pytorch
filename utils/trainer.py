@@ -1,4 +1,5 @@
 import torch 
+import torchmetrics
 import time
 import copy
 import os
@@ -13,6 +14,7 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 LOGGER = logging.getLogger("Torch-Cls")
 
 
+accuracy = torchmetrics.Accuracy(task="multiclass", num_classes=10, average='macro')
 
 def train_model(model, dataloaders, criterion, optimizer, opt):
     device, num_epochs, num_cls = opt.device, opt.n_epochs, opt.n_classes
@@ -29,7 +31,6 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
     val_acc_history = []
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
-    best_confusion_matrix = torch.zeros(num_cls, num_cls)
 
     model.to(device)
     for epoch in range(num_epochs):
@@ -48,7 +49,8 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
             running_items = 0
             running_loss = 0.0
             running_corrects = 0
-            confusion_matrix = torch.zeros(num_cls, num_cls)
+            list_preds = []
+            list_targets = []
 
             with tqdm(dataloaders[phase],
                 total=len(dataloaders[phase]),
@@ -58,6 +60,7 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                 for inputs, labels in _phase:
                     inputs = inputs.to(device)
                     labels = labels.to(device)
+                    list_targets.append(labels.data)
 
                     optimizer.zero_grad()
 
@@ -65,6 +68,8 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                         outputs = model(inputs)
                         loss = criterion(outputs, labels)
                         _, preds = torch.max(outputs, 1)
+                        list_preds.append(preds)
+                        
 
                         if phase == 'train':
                             loss.backward()
@@ -74,9 +79,6 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                     running_loss += loss.item() * inputs.size(0)
                     running_corrects += torch.sum(preds == labels.data)
 
-                    for t, p in zip(labels.view(-1), preds.view(-1)):
-                        confusion_matrix[t.long(), p.long()] += 1
-
                     epoch_loss = running_loss / running_items
                     epoch_acc = running_corrects.float() / running_items
 
@@ -84,13 +86,15 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
                     desc = ('%35s' + '%15.6g' * 2) % (mem, epoch_loss, epoch_acc)
                     _phase.set_description_str(desc)
 
+            epoch_preds = torch.cat([x for x in list_preds], dim=0)
+            epoch_targets = torch.cat([x for x in list_targets], dim=0)
+            print("acc: ", accuracy(epoch_preds, epoch_targets))
 
             save_ckpt(model, optimizer, PATH_SAVE, "epoch_{}.pt".format(epoch))
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
                 save_ckpt(model, optimizer, PATH_SAVE, "best.pt")
-                best_confusion_matrix = confusion_matrix
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
 

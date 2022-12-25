@@ -1,6 +1,6 @@
 import os
 import torch
-
+import torchmetrics
 
 def save_ckpt(model, optimizer, PATH, name_ckpt):
     path_save = os.path.join(PATH, "weights")
@@ -20,6 +20,14 @@ def load_ckpt(ckpt_path, model, optimizer):
     model.load_state_dict(ckpt["model_state_dict"])
     optimizer.load_state_dict(ckpt["optimizer_state_dict"])
     return model, optimizer
+
+
+def save_result(num_classes):
+    precision_macro = torchmetrics.Precision(task="multiclass", average='macro', num_classes=num_classes)
+    precision_micro = torchmetrics.Precision(task="multiclass", average='micro', num_classes=num_classes)
+    recall_macro = torchmetrics.Recall(task="multiclass", average='macro', num_classes=num_classes)
+    recall_micro = torchmetrics.Recall(task="multiclass", average='micro', num_classes=num_classes)
+    
 
 def colorstr(*input):
     *args, string = input if len(input) > 1 else ('blue', 'bold', input[0]) 

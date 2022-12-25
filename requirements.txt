@@ -1,4 +1,5 @@
 torch
+torchmetrics
 torchvision
 numpy
 PyYaml

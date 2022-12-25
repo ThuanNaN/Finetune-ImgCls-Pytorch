@@ -44,7 +44,7 @@ def save_result(epoch, predicts, targets, metrics, result_file):
     f1_score = metrics['f1_score'](predicts, targets).detach().cpu().numpy()
 
     with open(result_file, "a+") as f:
-        f.write(f"Epoch: {epoch}\t{accuracy:.6f}\t{precision:.6f}\t{recall:.6f}\t{f1_score:.6f}\n\n")
+        f.write(f"Epoch: {epoch}\t{accuracy:.6f}\t{precision:.6f}\t{recall:.6f}\t{f1_score:.6f}\n")
 
 
 

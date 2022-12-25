@@ -28,7 +28,7 @@ def train_model(model, dataloaders, criterion, optimizer, opt):
 
     result_file = os.path.join(PATH_SAVE, "result.txt")
     with open(result_file, "w") as f:
-        f.write("\tEpochs\tAccuracy\tPrecision\tRecall\tF1-Score\n")
+        f.write("\t\t\t\tAccuracy\t\tPrecision\t\tRecall\t\tF1-Score\n")
 
     val_acc_history = []
     best_model_wts = copy.deepcopy(model.state_dict())

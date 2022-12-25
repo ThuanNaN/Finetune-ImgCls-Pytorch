@@ -1,6 +1,7 @@
 import torch 
 import time
 import copy
+import os
 import logging
 import numpy as np
 from tqdm import tqdm
@@ -14,7 +15,12 @@ LOGGER = logging.getLogger("Torch-Cls")
 
 
 def train_model(model, dataloaders, criterion, optimizer, opt):
-    device, num_epochs, PATH_SAVE, num_cls = opt.device, opt.n_epochs, opt.PATH_SAVE, opt.n_classes
+    device, num_epochs, num_cls = opt.device, opt.n_epochs, opt.n_classes
+
+    PATH_SAVE = os.path.join(opt.check_points, opt.ckpt_name)
+    if not os.path.exists(PATH_SAVE):
+        os.mkdir(PATH_SAVE)
+
 
     since = time.time()
     LOGGER.info(f"\n{colorstr('Optimizer:')} {optimizer}")
